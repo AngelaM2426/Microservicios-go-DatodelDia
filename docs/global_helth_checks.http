@@ -1,0 +1,26 @@
+### GET Health Check (admin-service)
+GET {{baseUrl}}:8080/health
+
+### GET Health Check (analytics-service)
+GET {{baseUrl}}:8081/health
+
+### GET Health Check (document-service)
+GET {{baseUrl}}:8082/health
+
+### GET Health Check (job-offers-service)
+GET {{baseUrl}}:8083/health
+
+### GET Health Check (job-posting-service)
+GET {{baseUrl}}:8084/health
+
+### GET Health Check (public-data-service)
+GET {{baseUrl}}:8085/health
+
+### GET Health Check (user-cv-service)
+GET {{baseUrl}}:8086/health
+
+### GET Health Check (user-service)
+GET {{baseUrl}}:8087/health
+
+### GET Health Check (website-cms-service)
+GET {{baseUrl}}:8088/health

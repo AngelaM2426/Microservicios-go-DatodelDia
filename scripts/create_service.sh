@@ -35,14 +35,20 @@ cat <<EOF > $SERVICE_PATH/cmd/server/main.go
 package main
 
 import (
-	  "fmt"
 	  "log"
 	  "os"
 
 	  "github.com/gin-gonic/gin"
+	  "github.com/joho/godotenv"
 )
 
 func main() {
+
+    // Load environment variables from .env file
+    if err := godotenv.Load(); err != nil {
+        log.Println("No .env file found, continuing with system env vars")
+    }
+
     port := os.Getenv("PORT")
     if port == "" {
         port = "8080"
@@ -52,13 +58,18 @@ func main() {
     router.Use(gin.Logger())
     router.Use(gin.Recovery())
 
+    err := router.SetTrustedProxies(nil)
+    if err != nil {
+        log.Fatalf("Error setting trusted proxies: %v", err)
+    }
+
     // Healthcheck route
     router.GET("/health", func(c *gin.Context) {
         c.JSON(200, gin.H{"status": "ok"})
     })
 
     log.Printf("Starting $SERVICE_NAME on port %s...\n", port)
-    err := router.Run(":" + port)
+    err = router.Run(":" + port)
     if err != nil {
         log.Fatal("Failed to start server:", err)
     }
@@ -71,6 +82,12 @@ module $BASE_MODULE/$SERVICE_NAME
 
 go 1.24
 EOF
+
+# run go mod tidy inside the service
+(
+	cd $SERVICE_PATH
+	go mod tidy
+)
 
 # routes.go placeholder
 cat <<EOF > $SERVICE_PATH/internal/api/v1/routes.go
@@ -99,15 +116,30 @@ COPY --from=builder /app/.env .
 CMD ["./main"]
 EOF
 
+# Determine next available port
+USED_PORTS=$(grep -rh ^PORT= services/*/.env 2>/dev/null | cut -d= -f2)
+DEFAULT_PORT=8080
+NEXT_PORT=$DEFAULT_PORT
+
+if [ -n "$USED_PORTS" ]; then
+  MAX_PORT=$(echo "$USED_PORTS" | sort -n | tail -n 1)
+  NEXT_PORT=$((MAX_PORT + 1))
+fi
+
+echo "📦 Assigning PORT=$NEXT_PORT to $SERVICE_NAME"
+
 # .env.example
 cat <<EOF > $SERVICE_PATH/env.example
-PORT=8080
+PORT=$NEXT_PORT
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=secret
 DB_NAME=$SERVICE_NAME
 EOF
+
+# Generate working .env from template
+cp $SERVICE_PATH/env.example $SERVICE_PATH/.env
 
 # Makefile
 cat <<EOF > $SERVICE_PATH/Makefile
