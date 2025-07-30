@@ -1,1 +1,36 @@
-.idea
+# Go build artifacts
+**/bin/
+**/*.test
+**/main
+**/main.exe
+
+# Go workspace files (optional)
+go.work.sum
+
+# Environment variables
+**/.env
+**/.env.*
+
+# Logs
+**/*.log
+logs/
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.swp
+
+# Devcontainers
+.devcontainer/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Docker files
+**/main
+*.out
+
+# Test coverage / benchmarking
+coverage.*
+*.prof
