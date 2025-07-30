@@ -22,8 +22,8 @@
     6379
   ],
   "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind",
-    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind"
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind",
+    "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind"
   ],
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
