@@ -40,8 +40,10 @@ fmt:
 
 # Tidy all modules
 tidy:
-	@go work sync
-	@find services -name go.mod -execdir go mod tidy \;
+	@for dir in $(shell find services -name go.mod -exec dirname {} \;); do \
+		echo "🧹 Running 'go mod tidy' in $$dir"; \
+		$(MAKE) -C $$dir tidy; \
+	done
 
 # Run all tests
 test:

@@ -1,11 +1,12 @@
 package main
 
 import (
-	  "log"
-	  "os"
+	"ape-go-services/user-cv-service/internal/db"
+	"log"
+	"os"
 
-	  "github.com/gin-gonic/gin"
-	  "github.com/joho/godotenv"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -14,6 +15,9 @@ func main() {
     if err := godotenv.Load(); err != nil {
         log.Println("No .env file found, continuing with system env vars")
     }
+
+	// Connect to DB
+	db.Connect()
 
     port := os.Getenv("PORT")
     if port == "" {

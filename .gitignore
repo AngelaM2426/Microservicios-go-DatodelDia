@@ -20,9 +20,6 @@ logs/
 .idea/
 *.swp
 
-# Devcontainers
-.devcontainer/
-
 # System files
 .DS_Store
 Thumbs.db

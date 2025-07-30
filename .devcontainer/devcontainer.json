@@ -1,0 +1,33 @@
+{
+  "name": "ape-go-services",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace/ape-go-services",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "dbaeumer.vscode-eslint",
+        "oderwat.indent-rainbow",
+        "ms-azuretools.vscode-docker",
+        "mhutchie.git-graph",
+        "usernamehw.errorlens",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [
+    8080, 8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088,
+    5433, 5434, 5435, 5436, 5437, 5438, 5439, 5440, 5441,
+    6379
+  ],
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind",
+    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind"
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.bash",
+  "remoteUser": "vscode"
+}

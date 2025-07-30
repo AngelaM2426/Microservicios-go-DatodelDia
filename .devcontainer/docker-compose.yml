@@ -1,0 +1,147 @@
+version: '3.9'
+
+services:
+  devcontainer:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace/ape-go-services:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    depends_on:
+      - redis
+      - postgres-admin-service
+      - postgres-analytics-service
+      - postgres-document-service
+      - postgres-job-offers-service
+      - postgres-job-posting-service
+      - postgres-public-data-service
+      - postgres-user-cv-service
+      - postgres-user-service
+      - postgres-website-cms-service
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "8084:8084"
+      - "8085:8085"
+      - "8086:8086"
+      - "8087:8087"
+      - "8088:8088"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  postgres-job-offers-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: job_offers_service
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata-job-offers-service:/var/lib/postgresql/data
+
+  postgres-user-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: user_service
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata-user-service:/var/lib/postgresql/data
+
+  postgres-admin-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: admin_service
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata-admin-service:/var/lib/postgresql/data
+
+  postgres-analytics-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: analytics_service
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgdata-analytics-service:/var/lib/postgresql/data
+
+  postgres-document-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: document_service
+    ports:
+      - "5437:5432"
+    volumes:
+      - pgdata-document-service:/var/lib/postgresql/data
+
+  postgres-job-posting-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: job_posting_service
+    ports:
+      - "5438:5432"
+    volumes:
+      - pgdata-job-posting-service:/var/lib/postgresql/data
+
+  postgres-public-data-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: public_data_service
+    ports:
+      - "5439:5432"
+    volumes:
+      - pgdata-public-data-service:/var/lib/postgresql/data
+
+  postgres-user-cv-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: user_cv_service
+    ports:
+      - "5440:5432"
+    volumes:
+      - pgdata-user-cv-service:/var/lib/postgresql/data
+
+  postgres-website-cms-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: website_cms_service
+    ports:
+      - "5441:5432"
+    volumes:
+      - pgdata-website-cms-service:/var/lib/postgresql/data
+
+volumes:
+  pgdata-job-offers-service:
+  pgdata-user-service:
+  pgdata-admin-service:
+  pgdata-analytics-service:
+  pgdata-document-service:
+  pgdata-job-posting-service:
+  pgdata-public-data-service:
+  pgdata-user-cv-service:
+  pgdata-website-cms-service:

@@ -122,31 +122,6 @@ COPY --from=builder /app/services/$SERVICE_NAME/.env .
 CMD ["./main"]
 EOF
 
-# Determine next available port
-USED_PORTS=$(grep -rh ^PORT= services/*/.env 2>/dev/null | cut -d= -f2)
-DEFAULT_PORT=8080
-NEXT_PORT=$DEFAULT_PORT
-
-if [ -n "$USED_PORTS" ]; then
-  MAX_PORT=$(echo "$USED_PORTS" | sort -n | tail -n 1)
-  NEXT_PORT=$((MAX_PORT + 1))
-fi
-
-echo "📦 Assigning PORT=$NEXT_PORT to $SERVICE_NAME"
-
-# .env.example
-cat <<EOF > $SERVICE_PATH/env.example
-PORT=$NEXT_PORT
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=secret
-DB_NAME=$SERVICE_NAME
-EOF
-
-# Generate working .env from template
-cp $SERVICE_PATH/env.example $SERVICE_PATH/.env
-
 # Makefile
 cat <<EOF > $SERVICE_PATH/Makefile
 # Build the service binary
