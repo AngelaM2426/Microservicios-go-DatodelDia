@@ -101,8 +101,14 @@ cat <<EOF > $SERVICE_PATH/Dockerfile
 # Build stage
 FROM golang:1.24 AS builder
 
+# Set working dir before copying
 WORKDIR /app
+
+# Copy the entire monorepo (from root)
 COPY . .
+
+# Move into the service directory
+WORKDIR /app/services/$SERVICE_NAME
 
 RUN go mod tidy && go build -o main ./cmd/server
 
@@ -110,8 +116,8 @@ RUN go mod tidy && go build -o main ./cmd/server
 FROM gcr.io/distroless/base-debian12
 
 WORKDIR /app
-COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
+COPY --from=builder /app/services/$SERVICE_NAME/main .
+COPY --from=builder /app/services/$SERVICE_NAME/.env .
 
 CMD ["./main"]
 EOF
