@@ -1,8 +1,10 @@
+// File: services/website-cms-service/cmd/test_mongo/main.go
+// ---
 package main
 
 import (
 	"ape-go-services/pkg/mongodb"
-	"ape-go-services/pkg/repository"
+	"ape-go-services/website-cms-service/internal/repositories"
 	"ape-go-services/website-cms-service/internal/services"
 	"log"
 	"os"
@@ -12,7 +14,7 @@ import (
 
 func main() {
 	// Load environment variables
-	if err := godotenv.Load(); err != nil { // <-- REMOVE THE PATH
+	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, continuing with system env vars")
 	}
 
@@ -38,7 +40,7 @@ func main() {
 func testConnection() {
 	if mongodb.IsConnected() {
 		log.Println("✅ Successfully connected to MongoDB Atlas!")
-		log.Printf("📊 Database: %s", os.Getenv("MONGO_DATABASE"))
+		log.Printf("📂 Database: %s", os.Getenv("MONGO_DATABASE"))
 	} else {
 		log.Println("❌ Failed to connect to MongoDB")
 		return
@@ -46,7 +48,7 @@ func testConnection() {
 }
 
 func testRepository() {
-	repo := repository.NewItemRepository()
+	repo := repositories.NewItemRepository()
 
 	// Test retrieving all items
 	log.Println("🔍 Retrieving all items from the database...")
@@ -95,7 +97,7 @@ func testService() {
 	service := services.NewItemService()
 
 	// Test service layer
-	log.Println("🔄 Testing service layer...")
+	log.Println("⚙️ Testing service layer...")
 	items, err := service.GetAllItems()
 	if err != nil {
 		log.Printf("❌ Service error: %v", err)

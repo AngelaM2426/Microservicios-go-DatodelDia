@@ -1,21 +1,23 @@
+// File: services/website-cms-service/internal/services/item_service.go
+// ---
 package services
 
 import (
-	"ape-go-services/pkg/models"
-	"ape-go-services/pkg/repository"
+	"ape-go-services/website-cms-service/internal/models"
+	"ape-go-services/website-cms-service/internal/repositories"
 	"fmt"
 	"log"
 )
 
 // ItemService handles business logic for items
 type ItemService struct {
-	repo *repository.ItemRepository
+	repo *repositories.ItemRepository
 }
 
 // NewItemService creates a new ItemService
 func NewItemService() *ItemService {
 	return &ItemService{
-		repo: repository.NewItemRepository(),
+		repo: repositories.NewItemRepository(),
 	}
 }
 

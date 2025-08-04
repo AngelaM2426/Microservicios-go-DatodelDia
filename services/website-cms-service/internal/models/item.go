@@ -1,3 +1,5 @@
+// File: services/website-cms-service/internal/models/item.go
+// ---
 package models
 
 import (
@@ -15,15 +17,6 @@ type Item struct {
 	Quantity  int                `bson:"quantity" json:"quantity"`
 	CreatedAt *time.Time         `bson:"created_at,omitempty" json:"created_at,omitempty"`
 	UpdatedAt *time.Time         `bson:"updated_at,omitempty" json:"updated_at,omitempty"`
-}
-
-// ItemRepository defines the interface for item operations
-type ItemRepository interface {
-	GetAll() ([]Item, error)
-	GetByID(id string) (*Item, error)
-	Create(item *Item) error
-	Update(id string, item *Item) error
-	Delete(id string) error
 }
 
 // NewItem creates a new Item with timestamps

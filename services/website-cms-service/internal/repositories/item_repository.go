@@ -1,12 +1,14 @@
-package repository
+// File: services/website-cms-service/internal/repositories/item_repository.go
+// ---
+package repositories
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"ape-go-services/pkg/models"
 	"ape-go-services/pkg/mongodb"
+	"ape-go-services/website-cms-service/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,7 +17,7 @@ import (
 
 const ItemsCollectionName = "items"
 
-// ItemRepository implements the ItemRepository interface
+// ItemRepository implements the data access logic for items.
 type ItemRepository struct {
 	collection *mongo.Collection
 	timeout    time.Duration
