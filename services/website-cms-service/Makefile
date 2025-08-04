@@ -6,6 +6,10 @@ build:
 run:
 	go run ./cmd/server
 
+# Run MongoDB test
+test-mongo:
+	go run ./cmd/test_mongo
+
 # Run tests
 test:
 	go test ./...

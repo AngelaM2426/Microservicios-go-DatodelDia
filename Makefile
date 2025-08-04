@@ -52,6 +52,14 @@ test:
 		go test $$dir/... || exit 1; \
 	done
 
+clean:
+	@echo "🧹 Cleaning all services..."
+	@for dir in $(shell find services -name go.mod -exec dirname {} \;); do \
+		echo "Cleaning $$dir"; \
+		(cd $$dir && go clean -i -x -testcache -cache); \
+	done
+	@echo "Clean complete."
+
 # Show help
 help:
 	@echo "Usage:"
