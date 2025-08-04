@@ -6,13 +6,13 @@ build:
 run:
 	go run ./cmd/server
 
-# Run MongoDB test
-test-mongo:
-	go run ./cmd/test_mongo
-
-# Run tests
+# Run all tests (unit tests by default) in verbose mode
 test:
-	go test ./...
+	go test -v ./...
+
+# Run only the integration tests (requires database and the 'integration' tag) in verbose mode
+test-integration:
+	go test -v -tags=integration ./...
 
 # Format code
 fmt:

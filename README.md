@@ -19,5 +19,6 @@ make test-service name=website-cms-service
 
 # Or navigate to the service directory and run directly
 cd services/website-cms-service
-make test-mongo
+make test
+make test-integration
 ```

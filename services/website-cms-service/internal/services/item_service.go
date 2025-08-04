@@ -11,13 +11,20 @@ import (
 
 // ItemService handles business logic for items
 type ItemService struct {
-	repo *repositories.ItemRepository
+	repo repositories.ItemRepositoryInterface
 }
 
-// NewItemService creates a new ItemService
+// NewItemService creates a new ItemService with a real repository.
 func NewItemService() *ItemService {
 	return &ItemService{
 		repo: repositories.NewItemRepository(),
+	}
+}
+
+// NewItemServiceWithRepository creates a new ItemService with a custom repository for testing.
+func NewItemServiceWithRepository(repo repositories.ItemRepositoryInterface) *ItemService {
+	return &ItemService{
+		repo: repo,
 	}
 }
 
@@ -32,7 +39,7 @@ func (s *ItemService) GetAllItems() ([]models.Item, error) {
 	return items, nil
 }
 
-// GetItemByID retrieves a single item by ID
+// GetItemByID retrieves a single item by ID  <-- THIS IS THE NEW METHOD
 func (s *ItemService) GetItemByID(id string) (*models.Item, error) {
 	item, err := s.repo.GetByID(id)
 	if err != nil {
