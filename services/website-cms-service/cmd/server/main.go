@@ -1,10 +1,16 @@
 package main
 
 import (
-	"ape-go-services/pkg/mongodb"
+	// The ONLY db import you need now
+	"ape-go-services/pkg/db"
+
+	// Internal packages
 	v1 "ape-go-services/website-cms-service/internal/api/v1"
-	"ape-go-services/website-cms-service/internal/db"
+	internalDB "ape-go-services/website-cms-service/internal/db"
+
+	// Standard and third-party
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,21 +20,22 @@ import (
 )
 
 func main() {
-	// Load environment variables from .env file
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, continuing with system env vars")
 	}
 
-	// Connect to PostgreSQL (existing)
-	db.Connect()
+	// Connect to PostgreSQL (no changes here)
+	if _, err := db.Connect(); err != nil {
+		log.Fatalf("Fatal Error: Failed to connect to PostgreSQL: %v", err)
+	}
+	internalDB.Init()
 
-	// Connect to MongoDB (new)
-	mongoConfig := mongodb.LoadConfigFromEnv()
-	if err := mongodb.Connect(mongoConfig); err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	// Connect to MongoDB (using renamed functions)
+	mongoConfig := db.LoadMongoConfigFromEnv()             // <-- UPDATED
+	if err := db.ConnectMongoDB(mongoConfig); err != nil { // <-- UPDATED
+		log.Fatalf("Fatal Error: Failed to connect to MongoDB: %v", err)
 	}
 
-	// Setup graceful shutdown
 	setupGracefulShutdown()
 
 	port := os.Getenv("PORT")
@@ -37,29 +44,28 @@ func main() {
 	}
 
 	router := gin.New()
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-
-	err := router.SetTrustedProxies(nil)
-	if err != nil {
+	router.Use(gin.Logger(), gin.Recovery())
+	if err := router.SetTrustedProxies(nil); err != nil {
 		log.Fatalf("Error setting trusted proxies: %v", err)
 	}
 
-	// Health check route
+	// Health check route (using renamed function)
 	router.GET("/health", func(c *gin.Context) {
-		mongoConnected := mongodb.IsConnected()
-		c.JSON(200, gin.H{
-			"status":            "ok",
-			"mongodb_connected": mongoConnected,
+		var isPostgresConnected bool
+		if rawDB, err := db.GetDB().DB(); err == nil && rawDB.Ping() == nil {
+			isPostgresConnected = true
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status":               "ok",
+			"mongodb_connected":    db.IsMongoDBConnected(), // <-- UPDATED
+			"postgresql_connected": isPostgresConnected,
 		})
 	})
 
-	// Setup API routes
 	v1.SetupRoutes(router)
 
 	log.Printf("Starting website-cms-service on port %s...", port)
-	err = router.Run(":" + port)
-	if err != nil {
+	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
 }
@@ -67,16 +73,16 @@ func main() {
 func setupGracefulShutdown() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-
 	go func() {
 		<-c
-		log.Println("Shutting down gracefully...")
-
-		// Disconnect from MongoDB
-		if err := mongodb.Disconnect(); err != nil {
+		log.Println("Shutdown signal received. Shutting down gracefully...")
+		if err := db.Disconnect(); err != nil { // <-- For Postgres
+			log.Printf("Error disconnecting from PostgreSQL: %v", err)
+		}
+		if err := db.DisconnectMongoDB(); err != nil { // <-- UPDATED for Mongo
 			log.Printf("Error disconnecting from MongoDB: %v", err)
 		}
-
+		log.Println("All connections closed. Exiting application.")
 		os.Exit(0)
 	}()
 }

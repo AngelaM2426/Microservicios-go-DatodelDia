@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"ape-go-services/pkg/mongodb"
+	"ape-go-services/pkg/db"
 	"ape-go-services/website-cms-service/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,7 +26,7 @@ type ItemRepository struct {
 // NewItemRepository creates a new ItemRepository
 func NewItemRepository() *ItemRepository {
 	return &ItemRepository{
-		collection: mongodb.GetCollection(ItemsCollectionName),
+		collection: db.GetMongoCollection(ItemsCollectionName),
 		timeout:    30 * time.Second,
 	}
 }

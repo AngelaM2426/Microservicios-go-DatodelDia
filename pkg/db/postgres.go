@@ -11,8 +11,15 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// Connect establishes a PostgreSQL connection using env vars
+// DB is the global GORM database instance
+var DB *gorm.DB
+
+// sqlDB is the underlying sql.DB instance, kept private to this package
+var sqlDB *gorm.DB
+
+// Connect establishes a PostgreSQL connection, tests it, and prepares it for use.
 func Connect() (*gorm.DB, error) {
+	// --- Configuration Loading ---
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
@@ -23,23 +30,73 @@ func Connect() (*gorm.DB, error) {
 		host, port, user, password, dbname)
 
 	config := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(logger.Silent), // Use logger.Info for verbose query logging
 	}
 
+	// --- Open Connection ---
+	// gorm.Open does not establish a connection, it only prepares the config.
 	db, err := gorm.Open(postgres.Open(dsn), config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open postgres connection: %w", err)
 	}
 
-	// Ping to ensure the connection is alive
-	sqlDB, err := db.DB()
+	// --- Connection Pool Configuration ---
+	// Get the underlying sql.DB object to configure the connection pool.
+	rawDB, err := db.DB()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
 	}
-	sqlDB.SetMaxOpenConns(10)
-	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	log.Printf("Connected to Postgres: %s", dbname)
+	// Set connection pool parameters as needed.
+	// TODO: Adjust these values based on your application's requirements.
+	// TODO: Consider making these configurable via environment variables.
+	rawDB.SetMaxOpenConns(25)
+	rawDB.SetMaxIdleConns(10)
+	rawDB.SetConnMaxLifetime(time.Hour)
 
-	return db, nil
+	// --- Connection Test (Ping) ---
+	// Ping the database to ensure the connection is actually alive.
+	log.Println("Pinging PostgreSQL database...")
+	if err := rawDB.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping postgres database: %w", err)
+	}
+
+	log.Printf("Successfully connected to Postgres database: %s", dbname)
+
+	// --- Set Global Variables ---
+	// Store the connection instances for global access and for the Disconnect function.
+	DB = db
+	sqlDB = db // Store the gorm.DB instance to access its .DB() method later.
+
+	return DB, nil
+}
+
+// Disconnect gracefully closes the PostgreSQL database connection.
+func Disconnect() error {
+	if sqlDB == nil {
+		log.Println("No PostgreSQL connection to close.")
+		return nil
+	}
+
+	log.Println("Closing PostgreSQL connection...")
+	rawDB, err := sqlDB.DB()
+	if err != nil {
+		return fmt.Errorf("failed to get underlying sql.DB for closing: %w", err)
+	}
+
+	if err := rawDB.Close(); err != nil {
+		return fmt.Errorf("failed to close postgres connection: %w", err)
+	}
+
+	log.Println("PostgreSQL connection closed gracefully.")
+	return nil
+}
+
+// GetDB returns the active GORM database instance.
+// This is a helper to ensure we don't need to import and manage the DB instance themselves.
+func GetDB() *gorm.DB {
+	if DB == nil {
+		log.Fatal("PostgreSQL connection has not been initialized. Call db.Connect() first.")
+	}
+	return DB
 }
