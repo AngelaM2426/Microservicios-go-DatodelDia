@@ -6,6 +6,7 @@ use (
 	./pkg
 	./services/admin-service
 	./services/analytics-service
+	./services/boilerplate-service
 	./services/document-service
 	./services/job-offers-service
 	./services/job-posting-service
