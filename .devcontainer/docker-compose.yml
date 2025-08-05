@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   devcontainer:
     build:
@@ -135,6 +133,17 @@ services:
     volumes:
       - pgdata-website-cms-service:/var/lib/postgresql/data
 
+  postgres-boilerplate-service:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ape_user
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: boilerplate_service
+    ports:
+      - "5442:5432"
+    volumes:
+      - pgdata-boilerplate-service:/var/lib/postgresql/data
+
 volumes:
   pgdata-job-offers-service:
   pgdata-user-service:
@@ -145,3 +154,4 @@ volumes:
   pgdata-public-data-service:
   pgdata-user-cv-service:
   pgdata-website-cms-service:
+  pgdata-boilerplate-service:

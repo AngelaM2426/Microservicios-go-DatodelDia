@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Grant the vscode user permissions to use the Docker socket
+sudo usermod -aG docker vscode
+echo "postCreateCommand script finished successfully."
+
 set -e
 
 echo "Initializing .env files for all services..."
