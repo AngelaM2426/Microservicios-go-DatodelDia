@@ -5,7 +5,7 @@
 package repositories
 
 import (
-	"ape-go-services/pkg/mongodb"
+	"ape-go-services/pkg/db"
 	"ape-go-services/website-cms-service/internal/models"
 	"context"
 	"log"
@@ -35,8 +35,8 @@ func (s *ItemRepositoryIntegrationSuite) SetupSuite() {
 		log.Fatalf("Error loading .env file for integration tests: %v", err)
 	}
 
-	mongoConfig := mongodb.LoadConfigFromEnv()
-	err := mongodb.Connect(mongoConfig)
+	mongoConfig := db.LoadMongoConfigFromEnv()
+	err := db.ConnectMongoDB(mongoConfig)
 	s.Require().NoError(err, "Failed to connect to MongoDB for integration tests")
 
 	s.repo = NewItemRepository()
@@ -47,7 +47,7 @@ func (s *ItemRepositoryIntegrationSuite) SetupSuite() {
 // TearDownSuite runs once after all tests in the suite have finished.
 // It's responsible for closing the database connection.
 func (s *ItemRepositoryIntegrationSuite) TearDownSuite() {
-	if err := mongodb.Disconnect(); err != nil {
+	if err := db.DisconnectMongoDB(); err != nil {
 		log.Printf("Error disconnecting from MongoDB: %v", err)
 	}
 	log.Println("MongoDB connection closed.")
