@@ -1,6 +1,6 @@
 ---
 name: 'Template: Feature Request - Backend'
-about: Describe this issue template's purpose here.
+about: Backen Go
 title: ''
 labels: ''
 assignees: ''
