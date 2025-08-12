@@ -2,18 +2,27 @@ package db
 
 import (
 	"ape-go-services/pkg/db"
-	"gorm.io/gorm"
+	"database/sql"
 	"log"
+	"os"
 )
 
-var DB *gorm.DB
+var BaseDeDatos *sql.DB
 
-func Connect() {
-	// Connect to the User Service database
-	conn, err := db.Connect()
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+func Conectar() {
+	rutaDB := os.Getenv("RUTA_PATO_DB")
+	if rutaDB == "" {
+		log.Fatal("La variable de entorno RUTA_PATO_DB no está definida")
 	}
-	DB = conn
-	log.Println("Database connected successfully")
+
+	conexion, err := db.ConectarPatoDB(rutaDB)
+	if err != nil {
+		log.Fatalf("Fallo al conectar a DuckDB: %v", err)
+	}
+	BaseDeDatos = conexion
+	log.Println("Conexión con DuckDB exitosa")
+}
+
+func Desconectar() error {
+	return db.DesconectarPatoDB()
 }

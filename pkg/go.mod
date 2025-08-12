@@ -19,3 +19,17 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 )
+
+require (
+	github.com/gin-gonic/gin v1.8.0 // indirect
+	github.com/go-playground/validator/v10 v10.11.0 // indirect
+	github.com/google/uuid v1.5.0 // indirect
+	github.com/jackc/pgx/v5 v5.6.0 // indirect
+	github.com/sirupsen/logrus v1.9.2 // indirect
+	github.com/spf13/cobra v1.7.0 // indirect
+	github.com/spf13/viper v1.15.0 // indirect
+)
+
+require (
+	github.com/marcboeker/go-duckdb v1.9.0
+)
