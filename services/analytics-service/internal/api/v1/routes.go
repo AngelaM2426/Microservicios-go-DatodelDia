@@ -1,7 +1,5 @@
 package v1
 
-// Define your routes and route groups here
-
 import (
 	"ape-go-services/analytics-service/internal/api/v1/handlers"
 
@@ -14,9 +12,5 @@ func ConfigurarRutas(router *gin.Engine) {
 
 	manejadorAnalitica := handlers.NuevoManejadorAnalitica()
 
-	// Endpoint para obtener el conteo total
-	v1.GET("/dato-del-dia/conteo", manejadorAnalitica.ObtenerConteoDatosDelDia)
-
-	// Endpoint para obtener el último dato del día
 	v1.GET("/dato-del-dia", manejadorAnalitica.ObtenerDatoMasReciente)
 }

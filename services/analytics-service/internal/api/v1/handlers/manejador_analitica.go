@@ -4,7 +4,6 @@ import (
 	"ape-go-services/analytics-service/internal/services"
 	"net/http"
 
-	// La corrección está aquí: se ha eliminado el ".com" extra.
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,31 +19,19 @@ func NuevoManejadorAnalitica() *ManejadorAnalitica {
 	}
 }
 
-// ObtenerConteoDatosDelDia maneja la petición GET /api/v1/dato-del-dia/conteo
-func (m *ManejadorAnalitica) ObtenerConteoDatosDelDia(c *gin.Context) {
-	conteo, err := m.servicio.ObtenerConteoDatosDelDia()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "No se pudo obtener el conteo de datos del día",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"conteo_datos_del_dia": conteo,
-	})
-}
-
 // ObtenerDatoMasReciente maneja la petición GET /api/v1/dato-del-dia
 func (m *ManejadorAnalitica) ObtenerDatoMasReciente(c *gin.Context) {
 	dato, err := m.servicio.ObtenerDatoMasReciente()
 	if err != nil {
+		// If the service returns any error, respond with a 500 Internal Server Error.
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Ocurrió un error al obtener el dato más reciente",
 		})
 		return
 	}
 
+	// The service returns `nil` (without an error) if no record was found.
+	// This should be handled as a 404 Not Found.
 	if dato == nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"mensaje": "No se encontraron datos del día",
@@ -52,6 +39,7 @@ func (m *ManejadorAnalitica) ObtenerDatoMasReciente(c *gin.Context) {
 		return
 	}
 
+	// On success, return a 200 OK with the data object.
 	c.JSON(http.StatusOK, gin.H{
 		"dato_del_dia": dato,
 	})
